@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import Header from '../../components/Header';
 import api from '../../services/api';
@@ -8,19 +8,19 @@ import ModalEditFood from '../../components/ModalEditFood';
 import { FoodsContainer } from './styles';
 
 interface IFood {
-  id: number;
-  name: string;
-  description: string;
-  price: string;
-  available: boolean;
-  image: string;
+  id:number;
+  name:string;
+  description:string;
+  price:string;
+  available:boolean;
+  image:string;
 }
 
 interface AddFood {
-  image: string;
-  name: string;
-  price: string;
-  description: string;
+  image:string;
+  name:string;
+  price:string;
+  description:string;
 }
 
 export default function Dashboard() {
@@ -30,33 +30,31 @@ export default function Dashboard() {
   const [editModalOpen, setEditModalOpen] = useState(false);
 
   useEffect(() => {
-    async function getFood() {
+    async function getFoods() {
       const response = await api.get('/foods');
 
       setFoods(response.data);
     }
-
-    getFood();
+    getFoods()
   }, [])
 
-  const handleAddFood = async (
-    food: AddFood): Promise<void> => {
+  
+  async function handleAddFood(
+    food: Omit<IFood, 'id' | 'available'>,
+  ): Promise<void> {
     try {
       const response = await api.post('/foods', {
         ...food,
         available: true,
       });
 
-      setFoods([
-        ...foods,
-        response.data
-      ])
+      setFoods([...foods, response.data]);
     } catch (err) {
       console.log(err);
     }
   }
 
-  const handleUpdateFood = async (food: AddFood) => {
+  const handleUpdateFood = async (food: AddFood): Promise<void> => {
     try {
       const foodUpdated = await api.put(
         `/foods/${editingFood.id}`,
@@ -73,8 +71,7 @@ export default function Dashboard() {
     }
   }
 
-  const handleDeleteFood = async (id: number) => {
-
+  const handleDeleteFood = async (id:number) => {
     await api.delete(`/foods/${id}`);
 
     const foodsFiltered = foods.filter(food => food.id !== id);
@@ -83,12 +80,11 @@ export default function Dashboard() {
   }
 
   const toggleModal = () => {
-
-    setModalOpen(!modalOpen);
+    setModalOpen( !modalOpen );
   }
 
   const toggleEditModal = () => {
-    setModalOpen(!modalOpen);
+    setEditModalOpen(!editModalOpen);
   }
 
   const handleEditFood = (food: IFood) => {
